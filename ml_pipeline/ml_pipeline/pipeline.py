@@ -4,15 +4,21 @@
 # pipeline.py
 import mlflow
 import mlflow.xgboost
+import os
 
 from ml_pipeline.config_loader import load_config
 from ml_pipeline.ingest import load_data, prepare_data, split_data
 from ml_pipeline.train import train_model
 from ml_pipeline.evaluate import evaluate_model
+from ml_pipeline.save import save_model, save_results
 
 def run_pipeline(config_path):
     config = load_config(config_path)
     print(f"Starting run: {config['run_name']}")
+
+    print("Tracking URI:", mlflow.get_tracking_uri())
+
+    mlflow.set_tracking_uri("http://127.0.0.1:5000")
 
     mlflow.set_experiment(config["data"]["raw_data_path"].split("/")[-1].replace(".csv", ""))
 
@@ -45,5 +51,23 @@ def run_pipeline(config_path):
 
         # Log model
         mlflow.sklearn.log_model(model, artifact_path="model")
+        
+        # Derive paths for saving model and results 
+        run_name = config["run_name"]
+        output_dir = os.path.join("outputs", run_name)
+
+        model_path = os.path.join(output_dir, "model.joblib")
+        results_path = os.path.join(output_dir, "results.json")
+
+        save_model(model, model_path)
+        save_results(results, results_path)
+
+        # Log output paths as MLflow artifacts
+        mlflow.log_artifact(model_path)
+        mlflow.log_artifact(results_path)
 
     return model, results
+
+if __name__ == "__main__":
+    import sys
+    run_pipeline(sys.argv[1])

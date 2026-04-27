@@ -18,9 +18,5 @@
     },
     "evaluation": {
         "metrics": ["accuracy", "f1"]
-    },
-    "output": {
-        "model_path": "outputs/model.pkl",
-        "results_path": "outputs/results.json"
     }
 }

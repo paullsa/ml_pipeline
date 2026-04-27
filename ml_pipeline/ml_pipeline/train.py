@@ -1,8 +1,10 @@
 # model training
 # train.py
+
 import xgboost as xgb
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-
+from sklearn.pipeline import Pipeline
+from ml_pipeline.preprocess import build_pipeline
 
 MODEL_REGISTRY = {
     "xgboost": {
@@ -22,5 +24,6 @@ def get_model(model_type, task, hyperparameters):
 
 def train_model(X_train, y_train, model_type, task, hyperparameters):
     model = get_model(model_type, task, hyperparameters)
-    model.fit(X_train, y_train)
-    return model
+    pipeline = build_pipeline(model)
+    pipeline.fit(X_train, y_train)
+    return pipeline
