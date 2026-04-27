@@ -44,6 +44,6 @@ def run_pipeline(config_path):
             mlflow.log_metric(metric_name, value)
 
         # Log model
-        mlflow.xgboost.log_model(model, artifact_path="model")
+        mlflow.sklearn.log_model(model, artifact_path="model")
 
     return model, results

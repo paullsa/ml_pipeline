@@ -1,11 +1,17 @@
 # model training
 # train.py
 import xgboost as xgb
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+
 
 MODEL_REGISTRY = {
     "xgboost": {
         "classification": xgb.XGBClassifier,
         "regression": xgb.XGBRegressor
+    },
+    "random_forest": {
+        "classification": RandomForestClassifier,
+        "regression": RandomForestRegressor
     }
 }
 

@@ -1,0 +1,26 @@
+{
+    "run_name": "iris_rf_v1",
+    "data": {
+        "raw_data_path": "data/raw/iris.csv",
+        "target_column": "X",
+        "exclude_columns": [],
+        "test_size": 0.2,
+        "random_state": 42
+    },
+    "model": {
+        "type": "random_forest",
+        "task": "classification",
+        "hyperparameters": {
+            "n_estimators": 100,
+            "max_depth": 4,
+            "random_state": 42
+        }
+    },
+    "evaluation": {
+        "metrics": ["accuracy", "f1"]
+    },
+    "output": {
+        "model_path": "outputs/model.pkl",
+        "results_path": "outputs/results.json"
+    }
+}
