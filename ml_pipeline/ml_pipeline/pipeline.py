@@ -1,9 +1,12 @@
 # orchestrates the full pipeline
 
-
 # pipeline.py
+
+from pyexpat import model
+
 import mlflow
 import mlflow.xgboost
+import mlflow.sklearn
 import os
 
 from ml_pipeline.config_loader import load_config
@@ -16,11 +19,14 @@ def run_pipeline(config_path):
     config = load_config(config_path)
     print(f"Starting run: {config['run_name']}")
 
+    mlflow.set_tracking_uri(config["mlflow"]["tracking_uri"])
     print("Tracking URI:", mlflow.get_tracking_uri())
 
-    mlflow.set_tracking_uri("http://127.0.0.1:5000")
-
-    mlflow.set_experiment(config["data"]["raw_data_path"].split("/")[-1].replace(".csv", ""))
+    experiment = mlflow.set_experiment(
+        config["mlflow"]["experiment_name"]
+    )
+    print("Experiment ID:", experiment.experiment_id)
+    print("Experiment name:", experiment.name)
 
     with mlflow.start_run(run_name=config["run_name"]):
 
@@ -50,21 +56,22 @@ def run_pipeline(config_path):
             mlflow.log_metric(metric_name, value)
 
         # Log model
-        mlflow.sklearn.log_model(model, artifact_path="model")
-        
-        # Derive paths for saving model and results 
+        if config["model"]["type"] == "xgboost":
+            mlflow.xgboost.log_model(model, "model")
+        else:
+            mlflow.sklearn.log_model(model, "model")
+
+        # Save locally for convenience
         run_name = config["run_name"]
+        
+        # Create outputs directory if it doesn't exist
+        os.makedirs(output_dir, exist_ok=True)
         output_dir = os.path.join("outputs", run_name)
+        save_model(model, os.path.join(output_dir, "model.joblib"))
+        save_results(results, os.path.join(output_dir, "results.json"))
 
-        model_path = os.path.join(output_dir, "model.joblib")
-        results_path = os.path.join(output_dir, "results.json")
-
-        save_model(model, model_path)
-        save_results(results, results_path)
-
-        # Log output paths as MLflow artifacts
-        mlflow.log_artifact(model_path)
-        mlflow.log_artifact(results_path)
+        # Log results to MLflow
+        mlflow.log_artifact(os.path.join(output_dir, "results.json"))
 
     return model, results
 

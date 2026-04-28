@@ -18,5 +18,10 @@
     },
     "evaluation": {
         "metrics": ["accuracy", "f1"]
+    },
+    "mlflow": {
+        "experiment_name": "Iris_Experiment",
+        "tracking_uri": "file:///C:/Python/ml_pipeline/mlruns"
     }
+
 }
