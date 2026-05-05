@@ -15,20 +15,20 @@ Config-driven ML pipeline with MLflow experiment tracking. Define your data, mod
 
 ```
 ml_pipeline/
-├── ml_pipeline/          # Package source
-│   ├── config_loader.py  # JSON config loading
-│   ├── ingest.py         # Data loading & train/test splitting
-│   ├── preprocess.py     # Scaler registry & sklearn Pipeline builder
-│   ├── train.py          # Model registry & training
-│   ├── evaluate.py       # Metric registry & evaluation
-│   ├── save.py           # Model & results persistence
-│   └── pipeline.py       # Main orchestrator (run_pipeline)
+├── src/
+│   └── ml_pipeline/          # Package source
+│       ├── config_loader.py  # JSON config loading
+│       ├── ingest.py         # Data loading & train/test splitting
+│       ├── preprocess.py     # Scaler registry & sklearn Pipeline builder
+│       ├── train.py          # Model registry & training
+│       ├── evaluate.py       # Metric registry & evaluation
+│       ├── save.py           # Model & results persistence
+│       └── pipeline.py       # Main orchestrator (run_pipeline)
 ├── configs/              # JSON run configs
 │   ├── example_run.json  # Iris + XGBoost baseline
 │   └── iris_rf_v1.json   # Iris + Random Forest variant
 ├── data/
 │   └── raw/iris.csv      # Example dataset
-├── outputs/              # Auto-created: model.joblib + results.json per run
 ├── tests/
 │   └── test_train.py     # Unit tests
 └── pyproject.toml
@@ -56,7 +56,7 @@ joblib
 ## Quick Start
 
 ```python
-from ml_pipeline.pipeline import run_pipeline
+from ml_pipeline import run_pipeline
 
 model, results = run_pipeline("configs/example_run.json")
 print(results)  # {"accuracy": 1.0, "f1": 1.0}
@@ -97,10 +97,6 @@ All behaviour is controlled by a single JSON file:
   "evaluation": {
     "metrics": ["accuracy", "f1"]
   },
-  "output": {
-    "model_path": "outputs/iris_baseline_v1/model.joblib",
-    "results_path": "outputs/iris_baseline_v1/results.json"
-  },
   "mlflow": {
     "experiment_name": "Iris_Experiment",
     "tracking_uri": "file:///C:/Python/ml_pipeline/mlruns"
@@ -130,9 +126,8 @@ run_pipeline(config_path)
   │  │  ├─ get_model()      → estimator from MODEL_REGISTRY
   │  │  └─ build_pipeline() → sklearn Pipeline([scaler, model])
   │  ├─ evaluate_model()    → metrics dict
-  │  ├─ mlflow.log_param/metric/artifact
-  │  ├─ save_model()        → model.joblib
-  │  └─ save_results()      → results.json
+  │  ├─ mlflow.log_param/metric/model
+  │  └─ mlflow.log_dict()   → results.json artifact
   └─ return (model, results)
 ```
 
@@ -194,9 +189,15 @@ Tests verify that `train_model` returns an sklearn `Pipeline` and that it can ge
 
 ## Output Files
 
-Each run produces:
+All artifacts are stored in MLflow. Retrieve them via:
 
-| File | Contents |
-|------|---------|
-| `outputs/{run_name}/model.joblib` | Serialized sklearn Pipeline |
-| `outputs/{run_name}/results.json` | Evaluation metrics dict |
+```powershell
+mlflow artifacts download --run-id <run-id> --dst-path ./downloads
+```
+
+Or load the model directly:
+
+```python
+import mlflow.sklearn
+model = mlflow.sklearn.load_model("runs:/<run-id>/model")
+```

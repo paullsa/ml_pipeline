@@ -4,13 +4,11 @@
 
 import mlflow
 import mlflow.sklearn
-import os
 
 from ml_pipeline.config_loader import load_config
 from ml_pipeline.ingest import load_data, prepare_data, split_data
 from ml_pipeline.train import train_model
 from ml_pipeline.evaluate import evaluate_model
-from ml_pipeline.save import save_model, save_results
 
 def run_pipeline(config_path):
     config = load_config(config_path)
@@ -61,18 +59,7 @@ def run_pipeline(config_path):
             mlflow.log_metric(metric_name, value)
 
         mlflow.sklearn.log_model(model, "model")
-
-        # Save locally
-        run_name = config["run_name"]
-        output_cfg = config.get("output", {})
-        model_path = output_cfg.get("model_path", os.path.join("outputs", run_name, "model.joblib"))
-        results_path = output_cfg.get("results_path", os.path.join("outputs", run_name, "results.json"))
-
-        os.makedirs(os.path.dirname(model_path), exist_ok=True)
-        save_model(model, model_path)
-        save_results(results, results_path)
-
-        mlflow.log_artifact(results_path)
+        mlflow.log_dict(results, "results.json")
 
     return model, results
 

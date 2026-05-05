@@ -11,7 +11,9 @@
       "Read(//c/Users/alist/AppData/Local/Programs//**)",
       "Bash(ls /c/Users/alist/AppData/Local/Programs/Python/ 2>&1 || find /c/Users/alist -name \"python.exe\" -maxdepth 8 2>/dev/null | head -5)",
       "Read(//c/Users/alist/**)",
-      "Bash(/c/Users/alist/AppData/Local/Programs/Python/Python314/python.exe -m ml_pipeline.pipeline configs/example_run.json)"
+      "Bash(/c/Users/alist/AppData/Local/Programs/Python/Python314/python.exe -m ml_pipeline.pipeline configs/example_run.json)",
+      "Bash(/c/Users/alist/miniforge3/envs/ap_env/python.exe -m pip install -e . -q)",
+      "Bash(/c/Users/alist/miniforge3/envs/ap_env/python.exe -c \"from ml_pipeline import run_pipeline, train_model, evaluate_model; print\\('OK'\\)\")"
     ]
   }
 }

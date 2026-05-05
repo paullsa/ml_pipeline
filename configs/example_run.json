@@ -22,10 +22,6 @@
     "evaluation": {
         "metrics": ["accuracy", "f1"]
     },
-    "output": {
-        "model_path": "outputs/iris_baseline_v1/model.joblib",
-        "results_path": "outputs/iris_baseline_v1/results.json"
-    },
     "mlflow": {
         "experiment_name": "Iris_Experiment",
         "tracking_uri": "file:///C:/Python/ml_pipeline/mlruns"
