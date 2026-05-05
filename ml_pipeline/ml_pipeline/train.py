@@ -22,8 +22,8 @@ def get_model(model_type, task, hyperparameters):
     model = model_class(**hyperparameters)
     return model
 
-def train_model(X_train, y_train, model_type, task, hyperparameters):
+def train_model(X_train, y_train, model_type, task, hyperparameters, scaler_type="standard", scaler_params=None):
     model = get_model(model_type, task, hyperparameters)
-    pipeline = build_pipeline(model)
+    pipeline = build_pipeline(model, scaler_type=scaler_type, scaler_params=scaler_params)
     pipeline.fit(X_train, y_train)
     return pipeline

@@ -2,10 +2,7 @@
 
 # pipeline.py
 
-from pyexpat import model
-
 import mlflow
-import mlflow.xgboost
 import mlflow.sklearn
 import os
 
@@ -44,7 +41,15 @@ def run_pipeline(config_path):
         print(f"Data loaded: {X_train.shape[0]} train rows, {X_test.shape[0]} test rows")
 
         # Train
-        model = train_model(X_train, y_train, config["model"]["type"], config["model"]["task"], config["model"]["hyperparameters"])
+        preproc_cfg = config.get("preprocessing", {})
+        model = train_model(
+            X_train, y_train,
+            config["model"]["type"],
+            config["model"]["task"],
+            config["model"]["hyperparameters"],
+            scaler_type=preproc_cfg.get("scaler", "standard"),
+            scaler_params=preproc_cfg.get("scaler_params", None),
+        )
         print(f"Model trained: {config['model']['type']}")
 
         # Evaluate
@@ -55,23 +60,19 @@ def run_pipeline(config_path):
         for metric_name, value in results.items():
             mlflow.log_metric(metric_name, value)
 
-        # Log model
-        if config["model"]["type"] == "xgboost":
-            mlflow.xgboost.log_model(model, "model")
-        else:
-            mlflow.sklearn.log_model(model, "model")
+        mlflow.sklearn.log_model(model, "model")
 
-        # Save locally for convenience
+        # Save locally
         run_name = config["run_name"]
-        
-        # Create outputs directory if it doesn't exist
-        os.makedirs(output_dir, exist_ok=True)
-        output_dir = os.path.join("outputs", run_name)
-        save_model(model, os.path.join(output_dir, "model.joblib"))
-        save_results(results, os.path.join(output_dir, "results.json"))
+        output_cfg = config.get("output", {})
+        model_path = output_cfg.get("model_path", os.path.join("outputs", run_name, "model.joblib"))
+        results_path = output_cfg.get("results_path", os.path.join("outputs", run_name, "results.json"))
 
-        # Log results to MLflow
-        mlflow.log_artifact(os.path.join(output_dir, "results.json"))
+        os.makedirs(os.path.dirname(model_path), exist_ok=True)
+        save_model(model, model_path)
+        save_results(results, results_path)
+
+        mlflow.log_artifact(results_path)
 
     return model, results
 
