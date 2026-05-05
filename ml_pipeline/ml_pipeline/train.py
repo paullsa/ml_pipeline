@@ -3,6 +3,7 @@
 
 import xgboost as xgb
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.svm import SVC, SVR
 from sklearn.pipeline import Pipeline
 from ml_pipeline.preprocess import build_pipeline
 
@@ -14,7 +15,11 @@ MODEL_REGISTRY = {
     "random_forest": {
         "classification": RandomForestClassifier,
         "regression": RandomForestRegressor
-    }
+    },
+    "svm": {
+        "classification": SVC,
+        "regression": SVR
+    },
 }
 
 def get_model(model_type, task, hyperparameters):

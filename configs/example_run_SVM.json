@@ -1,5 +1,5 @@
 {
-    "run_name": "iris_rf_v1",
+    "run_name": "iris_baseline_v1",
     "data": {
         "raw_data_path": "data/raw/iris.csv",
         "target_column": "species",
@@ -8,23 +8,23 @@
         "random_state": 42
     },
     "model": {
-        "type": "random_forest",
+        "type": "svm",
         "task": "classification",
         "hyperparameters": {
-            "n_estimators": 100,
-            "max_depth": 4,
-            "random_state": 42
+            "C": 1.0,
+            "kernel": "rbf",
+            "gamma": "scale"
         }
     },
     "preprocessing": {
-        "scaler": "standard"
+        "scaler": "none"
     },
     "evaluation": {
         "metrics": ["accuracy", "f1"]
     },
     "output": {
-        "model_path": "outputs/iris_rf_v1/model.joblib",
-        "results_path": "outputs/iris_rf_v1/results.json"
+        "model_path": "outputs/iris_baseline_v1/model.joblib",
+        "results_path": "outputs/iris_baseline_v1/results.json"
     },
     "mlflow": {
         "experiment_name": "Iris_Experiment",
