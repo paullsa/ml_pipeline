@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(/c/Users/alist/miniforge3/envs/ap_env/python.exe -m ml_pipeline.pipeline configs/example_run.json)",
-      "Bash(grep -E \"\\\\.\\(txt|md|yaml|yml\\)$\")"
-    ]
-  }
-}
