@@ -1,5 +1,7 @@
 # ml_pipeline
 
+I wanted to make sure I knew how to move from writing simple Juypter notebook model builds into the more MLOPS oriented pipeline used in production. The repo here does that - you define your experiments in a json file which is read into a Python dictionary and referenced throughout the various pieces of code when needed. I added saving the model locally, as well as in MLFlow just because I wanted to do it... 
+
 Config-driven ML pipeline with MLflow experiment tracking. Define your data, model, preprocessing, and metrics in a JSON config — the pipeline handles the rest.
 
 ## Features
