@@ -1,5 +1,6 @@
 import mlflow
 import mlflow.sklearn
+from pathlib import Path
 
 from ml_pipeline.config_loader import load_config
 from ml_pipeline.ingest import load_data, prepare_data, split_data
@@ -35,6 +36,7 @@ def run_pipeline(config_path):
         tuple[Pipeline, dict]: Fitted sklearn Pipeline and dict of metric results.
     """
     config = load_config(config_path)
+    project_root = Path(config_path).parent.parent
     print(f"Starting run: {config['run_name']}")
 
     mlflow.set_tracking_uri(config["mlflow"]["tracking_uri"])
@@ -54,7 +56,14 @@ def run_pipeline(config_path):
             mlflow.log_param(param, value)
 
         # Ingest
-        df = load_data(config["data"]["raw_data_path"])
+        raw_data_path = str((project_root / config["data"]["raw_data_path"]).resolve())
+        df = load_data(raw_data_path)
+        dataset = mlflow.data.from_pandas(
+            df,
+            source=raw_data_path,
+            targets=config["data"]["target_column"],
+        )
+        mlflow.log_input(dataset, context="training")
         X, y = prepare_data(df, config["data"]["target_column"], config["data"]["exclude_columns"])
         X_train, X_test, y_train, y_test = split_data(X, y, config["data"]["test_size"], config["data"]["random_state"])
         print(f"Data loaded: {X_train.shape[0]} train rows, {X_test.shape[0]} test rows")
@@ -79,7 +88,7 @@ def run_pipeline(config_path):
         for metric_name, value in results.items():
             mlflow.log_metric(metric_name, value)
 
-        mlflow.sklearn.log_model(model, "model")
+        mlflow.sklearn.log_model(model, name="model")
         mlflow.log_dict(results, "results.json")
 
         output_cfg = config.get("output", {})
