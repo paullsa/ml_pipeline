@@ -88,7 +88,17 @@ def run_pipeline(config_path):
         for metric_name, value in results.items():
             mlflow.log_metric(metric_name, value)
 
-        mlflow.sklearn.log_model(model, name="model")
+        mlflow.sklearn.log_model(
+            model,
+            name="model",
+            pip_requirements=[
+                "scikit-learn==1.8.0",
+                "cloudpickle==3.1.2",
+                "numpy==2.4.6",
+                "pandas",
+                "scipy",
+            ],
+        )
         mlflow.log_dict(results, "results.json")
 
         output_cfg = config.get("output", {})
