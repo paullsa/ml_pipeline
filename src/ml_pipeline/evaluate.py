@@ -50,8 +50,9 @@ def evaluate_model(model, X_test, y_test, metrics):
         if metric_name == "roc_auc":
             if y_prob is None:
                 raise ValueError(
-                    "roc_auc requires predict_proba but the model does not support it. "
-                    "For SVC, set probability=True in hyperparameters."
+                    f"roc_auc requires predict_proba but {type(model).__name__} does not "
+                    "support it. Check the model's hyperparameters (e.g. SVC needs "
+                    "probability=True) or remove roc_auc from the requested metrics."
                 )
             if y_prob.shape[1] == 2:
                 results[metric_name] = roc_auc_score(y_test, y_prob[:, 1])
