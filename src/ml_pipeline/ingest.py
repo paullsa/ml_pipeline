@@ -28,7 +28,8 @@ def prepare_data(df, target_column, exclude_columns):
         tuple[pd.DataFrame, pd.Series]: Feature matrix X and target vector y.
     """
     cols_to_drop = exclude_columns + [target_column]
-    missing = [c for c in cols_to_drop if c not in df.columns]
+    existing_cols = set(df.columns)
+    missing = [c for c in cols_to_drop if c not in existing_cols]
     if missing:
         raise ValueError(f"Columns not found in DataFrame: {missing}")
     X = df.drop(columns=cols_to_drop)
