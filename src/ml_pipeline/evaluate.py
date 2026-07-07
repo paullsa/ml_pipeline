@@ -41,7 +41,9 @@ def evaluate_model(model, X_test, y_test, metrics):
         All other metrics use hard predictions from predict().
     """
     y_pred = model.predict(X_test)
-    y_prob = model.predict_proba(X_test) if hasattr(model, "predict_proba") else None
+    y_prob = None
+    if "roc_auc" in metrics and hasattr(model, "predict_proba"):
+        y_prob = model.predict_proba(X_test)
 
     results = {}
     for metric_name in metrics:
