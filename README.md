@@ -101,7 +101,7 @@ All behaviour is controlled by a single JSON file:
   },
   "mlflow": {
     "experiment_name": "Iris_Experiment",
-    "tracking_uri": "file:///C:/Python/ml_pipeline/mlruns"
+    "tracking_uri": "sqlite:///C:/Python/ml_pipeline/mlflow.db"
   }
 }
 ```
